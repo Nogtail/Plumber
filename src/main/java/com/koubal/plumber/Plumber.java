@@ -18,6 +18,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -31,13 +32,13 @@ public class Plumber {
 	private static boolean isUnix = !System.getProperty("os.name").startsWith("Windows");
 	private static GUI gui;
 	private static int progress = 0;
-	private static File jarLocation = new File(Plumber.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile();
+	private static File jarLocation;
 	private static File jacobe = new File(jarLocation, "jacobe");
 
 	public static void main(String[] args) {
 		gui = new GUI();
 		gui.setVisible(true);
-		gui.appendStatus("Starting Plumber in " + jarLocation.toString());
+		gui.appendStatus("Welcome to Plumber version 1.1");
 	}
 
 	public static boolean isRunning() {
@@ -47,7 +48,8 @@ public class Plumber {
 	public static void run() throws Exception {
 		running = true;
 
-		gui.appendStatus("Starting...");
+		jarLocation = Paths.get(Plumber.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toFile().getParentFile();
+		gui.appendStatus("Starting Plumber in " + jarLocation.toString());
 
 		if (System.getProperty("os.name").startsWith("Mac")) {
 			throw new RuntimeException("Sadly Mac OS is not supported at this time! Please run this on a Windows or Linux OS.");
