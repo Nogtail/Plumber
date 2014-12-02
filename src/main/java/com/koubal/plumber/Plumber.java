@@ -38,7 +38,7 @@ public class Plumber {
 	public static void main(String[] args) {
 		gui = new GUI();
 		gui.setVisible(true);
-		gui.appendStatus("Welcome to Plumber version 1.1");
+		gui.appendStatus("Welcome to Plumber version 1.1.1");
 	}
 
 	public static boolean isRunning() {
@@ -180,9 +180,11 @@ public class Plumber {
 			File clMappedJar = new File(finalMappedJar + "-cl");
 			File mMappedJar = new File(finalMappedJar + "-m");
 
-			runProcess("java -jar BuildData/bin/SpecialSource.jar -i " + vanillaJar + " -m BuildData/mappings/bukkit-1.8-cl.csrg -o " + clMappedJar);
-			runProcess( "java -jar BuildData/bin/SpecialSource-2.jar map -i " + clMappedJar + " -m " + "BuildData/mappings/bukkit-1.8-members.csrg -o " + mMappedJar);
-			runProcess("java -jar BuildData/bin/SpecialSource.jar -i " + mMappedJar + " --access-transformer BuildData/mappings/bukkit-1.8.at " + "-m BuildData/mappings/package.srg -o " + finalMappedJar);
+			gui.appendStatus(vanillaJar.toString());
+			gui.appendStatus(clMappedJar.toString());
+			runProcess("java -jar BuildData/bin/SpecialSource.jar -i \"" + vanillaJar + "\" -m BuildData/mappings/bukkit-1.8-cl.csrg -o \"" + clMappedJar + "\"");
+			runProcess( "java -jar BuildData/bin/SpecialSource-2.jar map -i \"" + clMappedJar + "\" -m " + "BuildData/mappings/bukkit-1.8-members.csrg -o \"" + mMappedJar + "\"");
+			runProcess("java -jar BuildData/bin/SpecialSource.jar -i \"" + mMappedJar + "\" --access-transformer BuildData/mappings/bukkit-1.8.at -m BuildData/mappings/package.srg -o \"" + finalMappedJar + "\"");
 		}
 		updateProgress();
 
@@ -194,7 +196,7 @@ public class Plumber {
 		}
 
 		gui.appendStatus("Installing mapped jar into Maven, a crash here usually indicates an unset JAVA_HOME");
-		runProcess(mavenCommand + " install:install-file -Dfile=" + finalMappedJar + " -Dpackaging=jar -DgroupId=org.spigotmc -DartifactId=minecraft-server -Dversion=1.8-SNAPSHOT");
+		runProcess(mavenCommand + " install:install-file -Dfile=\"" + finalMappedJar + "\" -Dpackaging=jar -DgroupId=org.spigotmc -DartifactId=minecraft-server -Dversion=1.8-SNAPSHOT");
 		updateProgress();
 
 		File decompile = new File(work, "decompile-" + mappingsVersion);
@@ -203,12 +205,12 @@ public class Plumber {
 
 			File classes = new File(decompile, "classes");
 			unzip(finalMappedJar, classes, "net/minecraft/server");
-			runProcess("java -jar BuildData/bin/fernflower.jar -dgs=1 -hdc=0 -rbr=0 -asc=1 " + classes + " " + decompile);
+			runProcess("java -jar BuildData/bin/fernflower.jar -dgs=1 -hdc=0 -rbr=0 -asc=1 \"" + classes + "\" \"" + decompile + "\"");
 		}
 		updateProgress();
 
 		String jacobePath = jacobe.getPath() + "/jacobe" + ((!isUnix) ? ".exe" : "");
-		runProcess(jacobePath + " -cfg=BuildData/bin/jacobe.cfg -nobackup -overwrite -outext=java " + decompile + "/net/minecraft/server");
+		runProcess(jacobePath + " -cfg=BuildData/bin/jacobe.cfg -nobackup -overwrite -outext=java \"" + decompile + "/net/minecraft/server\"");
 		updateProgress();
 
 		File nms = new File(craftBukkit, "src/main/java/net");
