@@ -5,10 +5,11 @@ echo Rebuilding Forked projects...
 
 set what=Bukkit
 set target=Spigot-API
+set branch=origin/master
 
 cd "%basedir%/%what%"
 git fetch
-git reset --hard origin/patched
+git reset --hard %branch%
 git branch -f upstream
 
 cd "%basedir%"
@@ -28,10 +29,11 @@ for %%f in ("%basedir%/%what%-Patches/*.patch") do git am --3way "%basedir%/%wha
 
 set what=CraftBukkit
 set target=Spigot-Server
+set branch=origin/patched
 
 cd "%basedir%/%what%"
 git fetch
-git reset --hard origin/patched
+git reset --hard %branch%
 git branch -f upstream
 
 cd "%basedir%"

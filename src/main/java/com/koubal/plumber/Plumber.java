@@ -38,7 +38,7 @@ public class Plumber {
 	public static void main(String[] args) {
 		gui = new GUI();
 		gui.setVisible(true);
-		gui.appendStatus("Welcome to Plumber version 1.1.1");
+		gui.appendStatus("Welcome to Plumber version 1.2");
 	}
 
 	public static boolean isRunning() {
@@ -60,6 +60,22 @@ public class Plumber {
 			runProcess("git --version");
 		} catch (Exception e) {
 			throw new RuntimeException("You do not appear to have Git installed! Please install Git to continue.\n" + e.getMessage());
+		}
+		updateProgress();
+
+		try {
+			runProcess("git config --global user.name");
+		} catch (Exception e) {
+			gui.appendStatus("Git name not set, setting to a default value.");
+			runProcess("git config --global user.name BuildTools");
+		}
+		updateProgress();
+
+		try {
+			runProcess("git config --global user.email");
+		} catch (Exception e) {
+			gui.appendStatus("Git email not set, setting to a default value.");
+			runProcess("git config --global user.email unconfigured@null.spigotmc.org");
 		}
 		updateProgress();
 
@@ -285,6 +301,41 @@ public class Plumber {
 
 		gui.appendStatus("Compiling Spigot & Spigot-API");
 		runProcess(mavenCommand + " clean install", spigot);
+
+		File servers = new File(jarLocation, "Servers");
+
+		if (!servers.exists()) {
+			gui.appendStatus("Creating directory to copy compiled servers to.");
+			servers.mkdir();
+		}
+
+		gui.appendStatus("Copying compiled server jars to folder " + servers);
+
+		File server = null;
+
+		for (File file : new File(craftBukkit, "target").listFiles()) {
+			if (file.getName().startsWith("craftbukkit-" + MC_VERSION)) {
+				server = file;
+			}
+		}
+
+		File craftBukkitJar = new File(servers, "CraftBukkit.jar");
+		craftBukkitJar.delete();
+		FileUtils.copyFile(server, craftBukkitJar);
+		gui.appendStatus("Copied CraftBukkit");
+		updateProgress();
+
+		for (File file : new File(spigot, "Spigot-Server/target").listFiles()) {
+			if (file.getName().startsWith("spigot-" + MC_VERSION)) {
+				server = file;
+			}
+		}
+
+		File spigotJar = new File(servers, "Spigot.jar");
+		spigotJar.delete();
+		FileUtils.copyFile(server, spigotJar);
+		gui.appendStatus("Copied Spigot");
+
 		gui.setProgress(100);
 	}
 

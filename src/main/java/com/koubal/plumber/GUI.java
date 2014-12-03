@@ -75,7 +75,7 @@ public class GUI extends JFrame {
 	}
 
 	public void setProgress(int progress) {
-		progress = (int) (progress * (100.0/27));
+		progress = (int) (progress * (100.0/30)); //The number of updateStatus calls, yes, I know this is a shitty way of doing it
 		progressBar.setValue(progress);
 		progressBar.setString(progress + "%");
 
