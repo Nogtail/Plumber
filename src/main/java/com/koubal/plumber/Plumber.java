@@ -19,9 +19,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -33,12 +31,13 @@ public class Plumber {
 	private static GUI gui;
 	private static int progress = 0;
 	private static File jarLocation;
+	private static String[] envp;
 	private static File jacobe = new File(jarLocation, "jacobe");
 
 	public static void main(String[] args) {
 		gui = new GUI();
 		gui.setVisible(true);
-		gui.appendStatus("Welcome to Plumber version 1.2");
+		gui.appendStatus("Welcome to Plumber version 1.3");
 	}
 
 	public static boolean isRunning() {
@@ -53,6 +52,42 @@ public class Plumber {
 
 		if (System.getProperty("os.name").startsWith("Mac")) {
 			throw new RuntimeException("Sadly Mac OS is not supported at this time! Please run this on a Windows or Linux OS.");
+		}
+		updateProgress();
+
+		if (!isUnix) {
+			File javaHome = null;
+			File java = new File("C:/Program Files (x86)/Java");
+			if (java.exists()) {
+				for (File file : java.listFiles()) {
+					if (file.getName().contains("jdk")) {
+						javaHome = file;
+					}
+				}
+			}
+
+			java = new File("C:/Program Files/Java");
+			if (java.exists()) {
+				for (File file : java.listFiles()) {
+					if (file.getName().contains("jdk")) {
+						javaHome = file;
+					}
+				}
+			}
+
+			if (javaHome != null) {
+				gui.appendStatus("Found Java! " + javaHome + " will be used for JAVA_HOME!");
+				Map env = new HashMap(System.getenv());
+				env.put("JAVA_HOME", javaHome.toString());
+				envp = new String[env.size()];
+				int index = 0;
+				for (String key : (Set<String>) env.keySet()) {
+					envp[index] = key + "=" + env.get(key);
+					index++;
+				}
+			} else {
+				gui.appendStatus("Could not find Java, we will continue anyway but you may have to set your JAVA_HOME!");
+			}
 		}
 		updateProgress();
 
@@ -420,7 +455,8 @@ public class Plumber {
 
 	private static void runProcess(String command, File dir) throws IOException, InterruptedException {
 		gui.appendStatus("Starting process " + command);
-		final Process process = Runtime.getRuntime().exec(command, null, dir);
+
+		final Process process = Runtime.getRuntime().exec(command, envp, dir);
 
 		new Thread(new Runnable() {
 			@Override

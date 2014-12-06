@@ -48,9 +48,12 @@ public class GUI extends JFrame {
 						try {
 							Plumber.run();
 						} catch (Exception e) {
-							appendStatus(e.getMessage());
+							if (e.getMessage() != null) {
+								appendStatus(e.getMessage());
+							}
+							appendStatus(e.toString());
 							for (StackTraceElement traceElement : e.getStackTrace()) {
-								appendStatus(traceElement.toString());
+								appendStatus("    at " + traceElement.toString());
 							}
 							startButton.setText("Error!");
 							progressBar.setForeground(Color.RED);
@@ -75,7 +78,7 @@ public class GUI extends JFrame {
 	}
 
 	public void setProgress(int progress) {
-		progress = (int) (progress * (100.0/30)); //The number of updateStatus calls, yes, I know this is a shitty way of doing it
+		progress = (int) (progress * (100.0/31)); //The number of updateStatus calls, yes, I know this is a shitty way of doing it
 		progressBar.setValue(progress);
 		progressBar.setString(progress + "%");
 
